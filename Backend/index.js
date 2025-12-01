@@ -1,4 +1,5 @@
 
+
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
@@ -7,7 +8,7 @@ import cors from "cors";
 import bookRoute from "./route/book.route.js";
 import userRoute from "./route/user.route.js";
 
-// Load environment variables FIRST
+// Load environment variables
 dotenv.config();
 
 const app = express();
@@ -17,12 +18,18 @@ app.use(express.json());
 const PORT = process.env.PORT || 4000;
 const URI = process.env.MongoDBURI;
 
-// Connect to MongoDB
-mongoose.connect(URI)
+// MongoDB connection
+mongoose
+  .connect(URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.log("MongoDB connection error:", err));
 
-// ✅ Health check route
+// Root route
+app.get("/", (req, res) => {
+  res.send("Backend is running");
+});
+
+// Health route
 app.get("/api/health", (req, res) => {
   res.status(200).json({
     status: "ok",
@@ -30,7 +37,7 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// API routes
+// Routes
 app.use("/api/book", bookRoute);
 app.use("/api/user", userRoute);
 
