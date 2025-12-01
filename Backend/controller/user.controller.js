@@ -1,29 +1,23 @@
 
 
-import User from "../model/user.model.js";
-import bcryptjs from "bcryptjs";
-
-// SIGNUP
 export const signup = async (req, res) => {
   try {
+    console.log("Request body:", req.body); // <-- log incoming data
     const { fullname, email, password } = req.body;
 
-    // check if user exists
+    if (!fullname || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
     const user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // hash password and save
     const hashPassword = await bcryptjs.hash(password, 10);
-    const createdUser = new User({
-      fullname,
-      email,
-      password: hashPassword,
-    });
+    const createdUser = new User({ fullname, email, password: hashPassword });
     await createdUser.save();
 
-    // send response
     res.status(201).json({
       message: "User created successfully",
       user: {
@@ -33,36 +27,7 @@ export const signup = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Signup error:", error.message);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
-
-// LOGIN
-export const login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(400).json({ message: "Invalid username or password" });
-    }
-
-    const isMatch = await bcryptjs.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid username or password" });
-    }
-
-    res.status(200).json({
-      message: "Login successful",
-      user: {
-        _id: user._id,
-        fullname: user.fullname,
-        email: user.email,
-      },
-    });
-  } catch (error) {
-    console.error("Login error:", error.message);
+    console.error("Signup error:", error); // <-- log full error
     res.status(500).json({ message: "Internal server error" });
   }
 };
