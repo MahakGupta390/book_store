@@ -12,8 +12,27 @@ import userRoute from "./route/user.route.js";
 dotenv.config();
 
 const app = express();
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://book-store-29hq.vercel.app"
+];
+
 app.use(cors({
-  origin: "https://book-store-29hq.vercel.app/" }));
+  origin: function(origin, callback){
+    if(!origin) return callback(null, true); // allow Postman / server requests
+    if(allowedOrigins.includes(origin)){
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+}));
+
+//   app.use(cors({
+//   origin: "https://book-store-29hq.vercel.app"
+// }));
+
 app.use(express.json());
 
 const PORT = process.env.PORT || 4000;
