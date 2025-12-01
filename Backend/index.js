@@ -13,7 +13,7 @@ dotenv.config();
 
 const app = express();
 app.use(cors({
-  origin: "https://your-frontend-url.vercel.app" }));
+  origin: "https://book-store-29hq.vercel.app/" }));
 app.use(express.json());
 
 const PORT = process.env.PORT || 4000;
